@@ -53,7 +53,7 @@ def get_stock_details(stock_symbol):
     financial_growth_url = f"https://financialmodelingprep.com/api/v3/financial-growth/{stock_symbol}?period=annual&apikey={FM_PREP_API_KEY}"
     financial_growth = get_jsonparsed_data(financial_growth_url)[0]
 
-    stock_details['financial_statement_year'] = financial_growth['calendarYear']
+    stock_details['financial_statement_date'] = financial_growth['date']
     stock_details['eps_growth'] = financial_growth['epsgrowth']
     stock_details['grossProfitGrowth'] = financial_growth['grossProfitGrowth']
 
@@ -92,11 +92,11 @@ def check_stock(stock):
             'returnOnAssets': (lambda x: x > 0.08, 'returnOnAssets > 0.08'),
             'returnOnEquity': (lambda x: x > 0.1, 'returnOnEquity > 0.1'),
             'eps_growth': (lambda x: x > 0.05, 'eps_growth > 0.05'),
-            'dividendYield': (lambda x: x > 0.03, 'dividendYield > 0.03'),
+            'dividendYield': (lambda x: 0 if x is None else x > 0.03, 'dividendYield > 0.03'),
             'interestCoverage': (lambda x: x > 2, 'interestCoverage > 2'),
-            'debtEquityRatio': (lambda x: x < 1.5, 'debtEquityRatio < 1.5'),
+            'debtEquityRatio': (lambda x: 0 < x < 1.5, '0 < debtEquityRatio < 1.5'),
             'realtime_pe_ratio': (lambda x: 10 < x < 25, '10 < realtime_pe_ratio < 25'),
-            'priceToBookRatio': (lambda x: x < 4, 'priceToBookRatio < 4'),
+            'priceToBookRatio': (lambda x: 0 < x < 4, '0 < priceToBookRatio < 4'),
             '1Y_change': (lambda x: x > 0.1, 'Average 1 year change > 0.1'),
             '3Y_change': (lambda x: x > 0.1, 'Average 3 years change > 0.1')
         }
@@ -120,15 +120,18 @@ def check_stock(stock):
 def main():
     current_stocks = ["AAPL", "MSFT", "CRWD", # Tech 
                       "UNH", "AMGN", # Health
-                      "WMT", # Retail
+                      "WMT", "HD", # Retail
+                      "ADM", # Food
                       "JPM", #Finance
                       "PLTR", "CGC", # Speculative 
                       ]
     
-    exploratory_stocks = []
+    exploratory_stocks = ['UROY', 'UUUU', 'LEU', 'SMR', 'URG', 'DNN', 'UEC','SBSW', 'NXE', 'CCJ']
+    gaming_stocks = ["UBER", "DIS", "EA", "TTWO"]
+    logistics = ["HD", "COST", "PDD", "LOW", "MELI", "LULU" ]
 
     # Modify this one:
-    stock_list = current_stocks
+    stock_list = logistics
     
     for id, stock_symbol in enumerate(stock_list):
         print(f"[{id}/{len(stock_list)-1}]")
