@@ -12,7 +12,7 @@ load_dotenv()
 FM_PREP_API_KEY = os.environ.get("FM_PREP_API_KEY")
 
 def get_jsonparsed_data(url):
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    ssl_context = ssl.create_default_context()
     response = urlopen(url, context=ssl_context)
     data = response.read().decode("utf-8")
     return json.loads(data)
@@ -105,6 +105,10 @@ def check_stock(stock):
         value = stock[key]
         if isinstance(value, float):
             value = round(value, 3)
+
+        if value is None:
+            continue
+
         if key in checks:
             condition, condition_str = checks[key]
             if condition(value):
@@ -126,16 +130,22 @@ def main():
                       "PLTR", "CGC", # Speculative 
                       ]
     
+    # These stocks are identified via https://www.tradingview.com/markets/stocks-usa/sectorandindustry-sector/
+    # Be diverse!
     exploratory_stocks = ['UROY', 'UUUU', 'LEU', 'SMR', 'URG', 'DNN', 'UEC','SBSW', 'NXE', 'CCJ']
     gaming_stocks = ["UBER", "DIS", "EA", "TTWO"]
-    logistics = ["HD", "COST", "PDD", "LOW", "MELI", "LULU" ]
+    retail = ["HD", "COST", "PDD", "LOW", "MELI", "LULU" ]
+    utilities = ["NEE", "SO", "DUK", "CEG"]
+    process_industry = ["LIN", "SHW", "ECL"]
+    consumer_services = ["TCOM", "CTAS"]
 
     # Modify this one:
-    stock_list = logistics
+    stock_list = consumer_services
     
     for id, stock_symbol in enumerate(stock_list):
         print(f"[{id}/{len(stock_list)-1}]")
         stock = get_stock_details(stock_symbol)
         check_stock(stock)
 
-main()
+if __name__ == '__main__':
+    main()
